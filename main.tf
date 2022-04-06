@@ -133,18 +133,20 @@ resource "azurerm_virtual_machine" "principal"{
 }
 
 resource "null_resource" "subirApache"{
+	connection{
+		type = "ssh"
+		user = "${var.usuario}"
+		password = "${var.senha}"
+		host = azurerm_public_ip.principal.ip_address
+	}
 	provisioner "remote-exec"{
-		connection{
-			type = "ssh"
-			user = "${var.usuario}"
-			password = "${var.senha}"
-			host = azurerm_public_ip.principal.ip_address
-		}
 		inline = [
 			"sudo apt update -y",
 			"sudo apt install -y apache2"
 		]
 	}
+
+	depends_on = [azurerm_virtual_machine.principal]
 }
 
 output "public_ip_address"{
